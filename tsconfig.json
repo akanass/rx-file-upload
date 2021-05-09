@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "target": "esnext",
+    "moduleResolution": "node",
+    "baseUrl": "./",
+    "declaration": true,
+    "declarationDir": "./dist/types",
+    "removeComments": true,
+    "allowSyntheticDefaultImports": true,
+    "stripInternal": true,
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    "lib": [
+      "es2018",
+      "dom"
+    ]
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "rollup.*.ts",
+  ]
+}

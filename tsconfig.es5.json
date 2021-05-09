@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "target": "es5",
+    "declaration": false,
+    "declarationDir": null,
+    "importHelpers": true,
+    "downlevelIteration": true,
+    "lib": [
+      "es5",
+      "dom"
+    ]
+  }
+}
