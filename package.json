@@ -1,0 +1,71 @@
+{
+  "name": "@akanass/rx-file-upload",
+  "version": "1.0.0",
+  "description": "Library to upload a file in the browser and send it fully or in several chunks to the server.",
+  "main": "es5/index.js",
+  "main:es2018": "es2018/index.js",
+  "types": "types/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:akanass/rx-file-upload.git"
+  },
+  "author": "Akanass <akanass@icloud.com>",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "test": "echo 'To have a real implementation and test of this library, go to https://github.com/akanass/upload-file-with-chunks'",
+    "build": "rollup -c"
+  },
+  "bugs": "https://github.com/akanass/rx-file-upload/issues",
+  "homepage": "https://github.com/akanass/rx-file-upload#readme",
+  "keywords": [
+    "Browser",
+    "FormData",
+    "File",
+    "Chunks",
+    "Upload",
+    "Streams",
+    "Async",
+    "RxJS",
+    "ReactiveX",
+    "Observable",
+    "Observer",
+    "Subject",
+    "ES2015",
+    "ES2016",
+    "ES2017",
+    "ES2018",
+    "ES2019",
+    "ES2020",
+    "ESNEXT",
+    "ES5",
+    "ESM",
+    "Typescript"
+  ],
+  "dependencies": {
+    "crypto-es": "^1.2.7"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^13.0.0",
+    "@rollup/plugin-typescript": "^8.2.1",
+    "@types/node": "^15.0.2",
+    "@types/fs-extra": "^9.0.11",
+    "@typescript-eslint/eslint-plugin": "^4.22.1",
+    "@typescript-eslint/parser": "^4.22.1",
+    "eslint": "^7.25.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "fs-extra": "^10.0.0",
+    "prettier": "^2.2.1",
+    "rollup": "^2.47.0",
+    "rollup-plugin-delete": "^2.0.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "rxjs": "^7.0.0",
+    "ts-node": "^9.1.1",
+    "tslib": "^2.2.0",
+    "typescript": "^4.2.4"
+  },
+  "peerDependencies": {
+    "rxjs": "^7.0.0"
+  }
+}
