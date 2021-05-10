@@ -68,6 +68,13 @@ export class RxFileUploadCls implements RxFileUpload {
     'queryParams',
   ];
   /**
+   * Property to store allowed AJAX methods
+   *
+   * @private
+   * @internal
+   */
+  private readonly _allowedMethods: string[] = ['POST', 'PUT'];
+  /**
    * Property to store 1024 bytes / 1 Kb
    *
    * @private
@@ -147,7 +154,7 @@ export class RxFileUploadCls implements RxFileUpload {
       );
 
     // check the method in the config and set the default value to POST
-    if (!['POST', 'PUT'].includes(config.method?.toUpperCase()))
+    if (!this._allowedMethods.includes(config.method?.toUpperCase()))
       config.method = 'POST';
     else config.method = config.method.toUpperCase();
 
