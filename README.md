@@ -57,7 +57,7 @@ This package can also be installed via **unpkg** by including the following scri
 <script src="https://unpkg.com/@akanass/rx-file-upload"></script>
 ```
 
-[back to top](#table-of-contents).
+[back to top](#table-of-contents)
 
 ## Usage
 
@@ -157,7 +157,7 @@ import { rxFileUpload } from '@akanass/rx-file-upload';
 
 To have a real implementation and test of this library, go to this [project](https://github.com/akanass/upload-file-with-chunks).
 
-[back to top](#table-of-contents).
+[back to top](#table-of-contents)
 
 ## API in Details
 
@@ -181,7 +181,7 @@ const manager: RxFileUpload = rxFileUpload({
 });
 ```
 
-[back to top](#table-of-contents).
+[back to top](#table-of-contents)
 
 ### `.progress$`
 
@@ -211,7 +211,7 @@ manager.progress$.subscribe({
 });
 ```
 
-[back to top](#table-of-contents).
+[back to top](#table-of-contents)
 
 ### `.upload<T>(oneFileOrMultipleFiles[,additionalFormData])`
 
@@ -287,7 +287,7 @@ formData.append('chunkData', JSON.stringify(data.chunkData)); // optional
 formData.append('[additionalFormData.fieldName]', JSON.stringify(data['[additionalFormData.fieldName]'])); // optional
 ```
 
-[back to top](#table-of-contents).
+[back to top](#table-of-contents)
 
 ### `supportsRxFileUpload()`
 
@@ -310,18 +310,18 @@ if (!!supportsRxFileUpload()) {
 }
 ```
 
-[back to top](#table-of-contents).
+[back to top](#table-of-contents)
 
 ## Types in Details
 
-### RxFileUpload
+### *RxFileUpload:*
 
 Represents the instance of the object to upload file to the server. This is the **main** type of the library.
 
 > - ***{Observable\<[RxFileUploadProgressData](#rxfileuploadprogressdata)\>} .progress$**: the `Observable` which streams progress data `RxFileUploadProgressData` for each file(s)/chunk(s) uploaded.*
 > - ***{Observable<[RxFileUploadResponse\<T\>](#rxfileuploadresponset)>} .upload\<T\>(oneFileOrMultipleFiles: File | File[], additionalFormData?: [RxFileUploadAdditionalFormData](#rxfileuploadadditionalformdata))**: the function to upload file to the server and returns the `Observable` which streams the response `RxFileUploadResponse<T>`, from the server, after each file has been uploaded.*
 
-### RxFileUploadConfig
+### *RxFileUploadConfig:*
 
 Represents the object to configure a new instance of [`RxFileUpload`](#rxfileuploadconfig-1) with the [`rxFileUpload(config)`](#rxfileuploadconfig) method.
 
@@ -341,21 +341,21 @@ Represents the object to configure a new instance of [`RxFileUpload`](#rxfileupl
 > - ***{number} chunkSize** (optional): The size in `bytes` of a chunk. The size of a chunk must be a multiple of `1024` bytes (1 Kb) else an error will be thrown when the library is instantiated. (default: `1048576` (1 Mb)).*
 > - ***{boolean} addChecksum** (optional): The flag to indicate if the file(s) `sha256 checksum` should be calculated before sending to the server. However, you should know that the larger the file, the longer the generation time will be, which will cause a delay before sending it to the server. (default: `false`).*
 
-### RxFileUploadAdditionalFormData
+### *RxFileUploadAdditionalFormData:*
 
 Represents the object to add additional data inside the `FormData` before sending the file(s) to the server with the [`.upload<T>(oneFileOrMultipleFiles[,additionalFormData])`](#uploadtonefileormultiplefilesadditionalformdata) method.
 
 > - ***{string} fieldName** (required): The key of the `FormData` key/pair data - `Read-Only`.*
 > - ***{string | object} data** (required): The value of the `FormData` key/pair data - `Read-Only`. This value will be automatically serialized, if it's an object, with a `JSON.stringify()`.*
 
-### RxFileUploadProgressData
+### *RxFileUploadProgressData:*
 
 Represents the object sent by the progress `Observable` when subscribing to the [`.progress$`](#progress) attribute.
 
 > - ***{number} progress** (required): The current progress value for the upload of a file - `Read-Only`. It does not matter if the file is sent totally or in chunks, the value of progress will be calculated according to the type of send.*
 > - ***{number} fileIndex** (optional): The file index in the array of files for a multiple files upload - `Read-Only`. (default: `undefined`).*
 
-### RxFileUploadResponse\<T\>
+### *RxFileUploadResponse\<T\>:*
 
 Represents the response, from the server, streamed by the `Observable`, after each file has been uploaded, when subscribing to the [`.upload<T>(oneFileOrMultipleFiles[,additionalFormData])`](#uploadtonefileormultiplefilesadditionalformdata) method. `<T>` is a generic value that corresponds to the type of the response sent by the server.
 
@@ -364,26 +364,26 @@ Represents the response, from the server, streamed by the `Observable`, after ea
 > - ***{Record\<string, string\>} responseHeaders** (required): A dictionary of the response headers - `Read-Only`.*
 > - ***{number} fileIndex** (optional): The file index in the array of files for a multiple files upload - `Read-Only`. (default: `undefined`).*
 
-### RxFileUploadError
+### *RxFileUploadError:*
 
 Represents the error response, from the server, streamed by the `Observable`, during each file upload, when subscribing to the [`.upload<T>(oneFileOrMultipleFiles[,additionalFormData])`](#uploadtonefileormultiplefilesadditionalformdata) method.
 
 > - ***{number} status** (required): The HTTP status code, if the request has completed. If not, it is set to `0`.*
 > - ***{any} response** (required): The error response data.*
 
-[back to top](#table-of-contents).
+[back to top](#table-of-contents)
 
 ## Building for Production
 
 Two unbundled versions of this library are offered for your convenience, one targeting `ES5` and a second targeting `ESNEXT`.
 
-### ES5
+### *ES5:*
 
 The `ES5` version is suitable for use when **deprecated browsers** like `IE10+` or `Edge Legacy` need to be supported. This version is also the **default** version that gets pulled in as the `"main"` entry in **package.json**.
 
 **TypeScript** and **JavaScript** codebases alike can import and use this library without any special build configuration considerations.
 
-### ESNEXT
+### *ESNEXT:*
 
 The `ESNEXT` version is suitable for use when only **modern browsers** need to be supported. **TypeScript** and **JavaScript** codebases alike can import and use this library. However, you will need to ensure that your bundler pulls in the `ESNEXT` version of the library when building your application!
 
@@ -424,10 +424,10 @@ export default {
 
 `'main:esnext'` must come first in the list to ensure that the `ESNEXT` version of this library is bundled. Additional values can be added afterwards as needed.
 
-[back to top](#table-of-contents).
+[back to top](#table-of-contents)
 
 ## License
 
 This library is [MIT licensed](LICENSE.md).
 
-[back to top](#table-of-contents).
+[back to top](#table-of-contents)
