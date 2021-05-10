@@ -73,7 +73,14 @@ export class RxFileUploadCls implements RxFileUpload {
    * @private
    * @internal
    */
-  private readonly _allowedMethods: string[] = ['POST', 'PUT'];
+  private readonly _allowedAjaxMethods: string[] = ['POST', 'PUT'];
+  /**
+   * Property to store default AJAX method
+   *
+   * @private
+   * @internal
+   */
+  private readonly _defaultAjaxMethod: string = 'POST';
   /**
    * Property to store 1024 bytes / 1 Kb
    *
@@ -154,8 +161,8 @@ export class RxFileUploadCls implements RxFileUpload {
       );
 
     // check the method in the config and set the default value to POST
-    if (!this._allowedMethods.includes(config.method?.toUpperCase()))
-      config.method = 'POST';
+    if (!this._allowedAjaxMethods.includes(config.method?.toUpperCase()))
+      config.method = this._defaultAjaxMethod;
     else config.method = config.method.toUpperCase();
 
     // set default chunk size to 1 Mb
