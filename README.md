@@ -221,6 +221,7 @@ Function to upload **one** or **multiple** files, with or without chunks, to the
 
 **Parameters:**
 > ***{File | File[]} oneFileOrMultipleFiles** (required): the file(s) to upload to the server.*
+> 
 > ***{[RxFileUploadAdditionalFormData](#rxfileuploadadditionalformdata)} additionalFormData** (optional): object representing additional data added in the `FormData` before sending to the server.*
 
 **Return:**
@@ -327,19 +328,33 @@ Represents the instance of the object to upload file to the server. This is the 
 Represents the object to configure a new instance of [`RxFileUpload`](#rxfileuploadconfig-1) with the [`rxFileUpload(config)`](#rxfileuploadconfig) method.
 
 > - ***{string} url** (required): The address of the resource to request via HTTP. An error will be thrown if you don't provide it.*
+> 
 > - ***{string} method** (optional): The HTTP Method to use for the request. Only `POST` and `PUT` are allowed. (default: `POST`).*
+> 
 > - ***{Readonly\<Record\<string, any\>\>} headers** (optional): The HTTP headers to apply. **NOTE**: `Content-Type` header must not be included because it will be automatically added by the library with the good value.*
+> 
 > - ***{number} timeout** (optional): The time to wait before causing the underlying `XMLHttpRequest` to timeout. (default: `0`, which is idiomatic for `never timeout`).*
+> 
 > - ***{string} user** (optional): The user credentials username to send with the HTTP request. (default: `undefined`).*
+> 
 > - ***{string} password** (optional): The user credentials password to send with the HTTP request. (default: `undefined`).*
+> 
 > - ***{boolean} crossDomain** (optional): Whether to send the HTTP request as a CORS request. (default: `false`).*
+> 
 > - ***{boolean} withCredentials** (optional): To send user credentials in a CORS request, set to `true`. To exclude user credentials from a CORS request, OR when cookies are to be ignored by the CORS response, set to `false`. (default: `false`).*
+> 
 > - ***{string} xsrfCookieName** (optional): The name of your site's `XSRF` cookie. (default: `undefined`).*
+> 
 > - ***{string} xsrfHeaderName** (optional): The name of a custom header that you can use to send your `XSRF` cookie. (default: `undefined`).*
+> 
 > - ***{XMLHttpRequestResponseType} responseType** (optional): Can be set to change the response type. Valid values are `"arraybuffer"`, `"blob"`, `"document"`, `"json"`, and `"text"`. Note that the type of `"document"` (such as an XML document) is ignored if the global context is not `Window`. (default: `"json"`).*
+> 
 > - ***{string | URLSearchParams | Record\<string, string | number | boolean | string[] | number[] | boolean[]\> | [string, string | number | boolean | string[] | number[] | boolean[]][]} queryParams** (optional): Query string parameters to add to the URL in the request. (This will require a polyfill for URL and URLSearchParams in Internet Explorer!). Accepts either a query string, a `URLSearchParams` object, a dictionary of key/value pairs, or an array of key/value entry tuples. (Essentially, it takes anything that new `URLSearchParams` would normally take). If, for some reason you have a query string in the url argument, this will append to the query string in the url, but it will also overwrite the value of any keys that are an exact match. In other words, an url of `/test?a=1&b=2`, with queryParams of `{ b: 5, c: 6 }` will result in a url of roughly `/test?a=1&b=5&c=6`. (default: `undefined`).*
+> 
 > - ***{boolean} useChunks** (optional): The flag to indicate if the file(s) should be split into several chunks before sending to the server and not sending the full file. (default: `false`).*
+> 
 > - ***{number} chunkSize** (optional): The size in `bytes` of a chunk. The size of a chunk must be a multiple of `1024` bytes (1 Kb) else an error will be thrown when the library is instantiated. (default: `1048576` (1 Mb)).*
+> 
 > - ***{boolean} addChecksum** (optional): The flag to indicate if the file(s) `sha256 checksum` should be calculated before sending to the server. However, you should know that the larger the file, the longer the generation time will be, which will cause a delay before sending it to the server. (default: `false`).*
 
 ### *RxFileUploadAdditionalFormData:*
@@ -347,6 +362,7 @@ Represents the object to configure a new instance of [`RxFileUpload`](#rxfileupl
 Represents the object to add additional data inside the `FormData` before sending the file(s) to the server with the [`.upload<T>(oneFileOrMultipleFiles[,additionalFormData])`](#uploadtonefileormultiplefilesadditionalformdata) method.
 
 > - ***{string} fieldName** (required): The key of the `FormData` key/pair data - `Read-Only`.*
+> 
 > - ***{string | object} data** (required): The value of the `FormData` key/pair data - `Read-Only`. This value will be automatically serialized, if it's an object, with a `JSON.stringify()`.*
 
 ### *RxFileUploadProgressData:*
@@ -354,6 +370,7 @@ Represents the object to add additional data inside the `FormData` before sendin
 Represents the object sent by the progress `Observable` when subscribing to the [`.progress$`](#progress) attribute.
 
 > - ***{number} progress** (required): The current progress value for the upload of a file - `Read-Only`. It does not matter if the file is sent totally or in chunks, the value of progress will be calculated according to the type of send.*
+> 
 > - ***{number} fileIndex** (optional): The file index in the array of files for a multiple files upload - `Read-Only`. (default: `undefined`).*
 
 ### *RxFileUploadResponse\<T\>:*
@@ -361,8 +378,11 @@ Represents the object sent by the progress `Observable` when subscribing to the 
 Represents the response, from the server, streamed by the `Observable`, after each file has been uploaded, when subscribing to the [`.upload<T>(oneFileOrMultipleFiles[,additionalFormData])`](#uploadtonefileormultiplefilesadditionalformdata) method. `<T>` is a generic value that corresponds to the type of the response sent by the server.
 
 > - ***{number} status** (required): The HTTP status code - `Read-Only`.*
+> 
 > - ***{T} response** (required): The response data, if any. Note that this will automatically be converted to the proper type - `Read-Only`.*
+> 
 > - ***{Record\<string, string\>} responseHeaders** (required): A dictionary of the response headers - `Read-Only`.*
+> 
 > - ***{number} fileIndex** (optional): The file index in the array of files for a multiple files upload - `Read-Only`. (default: `undefined`).*
 
 ### *RxFileUploadError:*
@@ -370,6 +390,7 @@ Represents the response, from the server, streamed by the `Observable`, after ea
 Represents the error response, from the server, streamed by the `Observable`, during each file upload, when subscribing to the [`.upload<T>(oneFileOrMultipleFiles[,additionalFormData])`](#uploadtonefileormultiplefilesadditionalformdata) method.
 
 > - ***{number} status** (required): The HTTP status code, if the request has completed. If not, it is set to `0`.*
+> 
 > - ***{any} response** (required): The error response data.*
 
 [back to top](#table-of-contents)
