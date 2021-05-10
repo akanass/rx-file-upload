@@ -405,10 +405,7 @@ The `ES5` version is suitable for use when **deprecated browsers** like `IE10+` 
 
 **TypeScript** and **JavaScript** codebases alike can import and use this library without any special build configuration considerations.
 
-However, you will need to ensure that the `tslib` dependency gets pulled into your build artifact:
-
-- If you are authoring your application in **TypeScript** then this package will be **automatically** included so long as your **tsconfig.json** sets `"target": "ES5"`.
-- If your application is written in **JavaScript** then you will need to install this package **manually** by adding it to `devDependencies` in your project's **package.json**:
+However, you will need to ensure that the `tslib@^2.2.0` dependency gets pulled into your build artifact then you will need to install this package **manually** by adding it to `devDependencies` in your project's **package.json**:
 
 ```sh
 $> npm install --save-dev tslib
