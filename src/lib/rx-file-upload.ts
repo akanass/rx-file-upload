@@ -192,7 +192,7 @@ export class RxFileUploadCls implements RxFileUpload {
    *
    * @return {Observable<RxFileUploadProgressData>} the Observable which streams progress data for each file(s)/chunk(s) uploaded
    */
-  public progress(): Observable<RxFileUploadProgressData> {
+  public get progress$(): Observable<RxFileUploadProgressData> {
     return this._progress$.pipe(distinctUntilChanged());
   }
 

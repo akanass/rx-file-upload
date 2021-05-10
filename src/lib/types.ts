@@ -10,7 +10,7 @@ export interface RxFileUpload {
    *
    * @return {Observable<RxFileUploadProgressData>} the Observable which streams progress data for each file(s)/chunk(s) uploaded
    */
-  progress(): Observable<RxFileUploadProgressData>;
+  progress$: Observable<RxFileUploadProgressData>;
 
   /**
    * Function to upload one or multiple files to the server with optional additional data
