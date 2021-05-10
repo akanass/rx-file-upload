@@ -55,6 +55,7 @@ export class RxFileUploadCls implements RxFileUpload {
    */
   private readonly _allowedConfigProperties: string[] = [
     'url',
+    'method',
     'headers',
     'timeout',
     'user',
@@ -134,11 +135,20 @@ export class RxFileUploadCls implements RxFileUpload {
    */
   constructor(config: RxFileUploadConfig) {
     // check if functionality is available
-    if (!supportsRxFileUpload()) {
+    if (!supportsRxFileUpload())
       throw new Error(
         'You must be in a compatible browser to use this library !!!',
       );
-    }
+
+    // check if we have at least the url in the config
+    if (typeof config?.url !== 'string')
+      throw new Error(
+        'You must at least provide the url in the configuration !!!',
+      );
+
+    // check the method in the config and set the default value to POST
+    if (!['POST', 'PUT'].includes(config.method?.toUpperCase()))
+      config.method = 'POST';
 
     // set default chunk size to 1 Mb
     this._chunkSize = this._oneKb * this._oneKb;
@@ -146,7 +156,10 @@ export class RxFileUploadCls implements RxFileUpload {
     // check if chunk size property is in the config
     if (typeof config.chunkSize === 'number') {
       // check chunk size before storing it
-      this._checkChunkSize(config.chunkSize);
+      if (config.chunkSize % this._oneKb !== 0)
+        throw new Error(
+          'The size of a chunk must be a multiple of 1024 bytes / 1 Kb !!!',
+        );
       // set chunk size
       this._chunkSize = config.chunkSize;
       // delete chunk size in config
@@ -636,22 +649,6 @@ export class RxFileUploadCls implements RxFileUpload {
     );
 
   /**
-   * Function to check if chunk size is a multiple of 1024 bytes (1 Kb)
-   *
-   * @param {number} chunkSize the size of one chunk
-   *
-   * @private
-   * @internal
-   */
-  private _checkChunkSize = (chunkSize: number): void => {
-    if (typeof chunkSize !== 'number' || chunkSize % this._oneKb !== 0) {
-      throw new Error(
-        'The size of a chunk must be a multiple of 1024 bytes / 1 Kb !!!',
-      );
-    }
-  };
-
-  /**
    * Helper to check the validity of the config object before setting it in instance property
    *
    * @param {Omit<RxFileUploadConfig, 'chunkSize' | 'addChecksum' | 'useChunks'>} config object to configure the xhr request
@@ -673,7 +670,7 @@ export class RxFileUploadCls implements RxFileUpload {
     // set configuration in class property after removing "content-type" header if exists
     // because the "body" will be a "FormData" so
     // a "content-type" of "multipart/form-data; boundary=----WebKitFormBoundary...." will be set automatically
-    // and, after adding "method" and "includeUploadProgress" properties.
+    // and, after adding "includeUploadProgress" properties.
     this._config = {
       ...(!!config.headers
         ? {
@@ -687,7 +684,6 @@ export class RxFileUploadCls implements RxFileUpload {
               ),
           }
         : { ...config }),
-      method: 'POST',
       includeUploadProgress: true,
     };
   };

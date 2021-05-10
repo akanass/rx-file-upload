@@ -35,7 +35,6 @@ export type RxFileUploadConfig = Omit<
   AjaxConfig,
   | 'body'
   | 'async'
-  | 'method'
   | 'createXHR'
   | 'progressSubscriber'
   | 'includeUploadProgress'
