@@ -14,7 +14,7 @@ const config: RollupOptions[] = [
     output: {
       dir: './dist',
       format: 'esm',
-      entryFileNames: 'esm/[name].js',
+      entryFileNames: 'esm/rx-file-upload.js',
       preferConst: true,
     },
     plugins: [
@@ -42,7 +42,7 @@ const config: RollupOptions[] = [
     output: {
       dir: './dist',
       format: 'esm',
-      entryFileNames: 'esm5/[name].js',
+      entryFileNames: 'esm5/rx-file-upload.js',
     },
     plugins: [
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -65,7 +65,7 @@ const config: RollupOptions[] = [
       dir: './dist',
       format: 'umd',
       name: 'RxFileUploadUnPkg',
-      entryFileNames: 'bundle/[name].umd.min.js',
+      entryFileNames: 'bundle/rx-file-upload.umd.min.js',
     },
     plugins: [
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment

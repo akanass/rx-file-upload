@@ -2,9 +2,9 @@
   "name": "@akanass/rx-file-upload",
   "version": "1.0.0",
   "description": "Library to upload a file in the browser and send it fully or in several chunks to the server.",
-  "main": "esm5/index.js",
-  "main:esnext": "esm/index.js",
-  "unpkg": "bundle/index.min.js",
+  "main": "esm5/rx-file-upload.js",
+  "main:esnext": "esm/rx-file-upload.js",
+  "unpkg": "bundle/rx-file-upload.min.js",
   "types": "types/index.d.ts",
   "repository": {
     "type": "git",
