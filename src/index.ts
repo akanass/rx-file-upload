@@ -1,9 +1,6 @@
+export { supportsRxFileUpload, rxFileUpload } from './lib/rx-file-upload';
 export {
-  supportsRxFileUpload,
-  rxFileUpload,
   RxFileUpload,
-} from './lib/rx-file-upload';
-export {
   RxFileUploadConfig,
   RxFileUploadAdditionalFormData,
   RxFileUploadProgressData,

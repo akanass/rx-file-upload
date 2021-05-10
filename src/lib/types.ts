@@ -1,4 +1,30 @@
 import { AjaxConfig, AjaxError, AjaxResponse } from 'rxjs/ajax';
+import { Observable } from 'rxjs';
+
+/**
+ * RxFileUpload interface definition
+ */
+export interface RxFileUpload {
+  /**
+   * Progress Observable
+   *
+   * @return {Observable<RxFileUploadProgressData>} the Observable which streams progress data for each file(s)/chunk(s) uploaded
+   */
+  progress(): Observable<RxFileUploadProgressData>;
+
+  /**
+   * Function to upload one or multiple files to the server with optional additional data
+   *
+   * @param {File|File[]} oneFileOrMultipleFiles the file(s) to upload to the server
+   * @param {RxFileUploadAdditionalFormData} additionalFormData sent to the server
+   *
+   * @return {Observable<RxFileUploadResponse<T>>} the Observable which streams the response from the server after each file has been uploaded
+   */
+  upload<T>(
+    oneFileOrMultipleFiles: File | File[],
+    additionalFormData?: RxFileUploadAdditionalFormData,
+  ): Observable<RxFileUploadResponse<T>>;
+}
 
 /**
  * RxFileUploadConfig type declaration

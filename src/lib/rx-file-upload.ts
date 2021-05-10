@@ -14,6 +14,7 @@ import {
 import { SHA256 } from 'crypto-es/lib/sha256';
 import { WordArray } from 'crypto-es/lib/core';
 import {
+  RxFileUpload,
   RxFileUploadAdditionalFormData,
   RxFileUploadBodyData,
   RxFileUploadChunkBodyData,
@@ -37,11 +38,13 @@ export const supportsRxFileUpload = (): boolean =>
   typeof FormData === 'function';
 
 /**
- * RxFileUpload class definition
+ * RxFileUploadCls class definition which implements RxFileUpload
  *
  * This class will do the process to upload file(s) fully or with chunks
+ *
+ * @internal
  */
-export class RxFileUpload {
+export class RxFileUploadCls implements RxFileUpload {
   /**
    * List of AjaxConfig allowed properties to be sure to have the right ones when using JS and not TS
    * because JS doesn't use typings so you can pass what you want inside and if one property isn't allowed
@@ -189,7 +192,7 @@ export class RxFileUpload {
    *
    * @return {Observable<RxFileUploadProgressData>} the Observable which streams progress data for each file(s)/chunk(s) uploaded
    */
-  public get progress$(): Observable<RxFileUploadProgressData> {
+  public progress(): Observable<RxFileUploadProgressData> {
     return this._progress$.pipe(distinctUntilChanged());
   }
 
@@ -753,5 +756,5 @@ export class RxFileUpload {
  *
  * @return {RxFileUpload} new instance
  */
-export const rxFileUpload = (config: RxFileUploadConfig) =>
-  new RxFileUpload(config);
+export const rxFileUpload = (config: RxFileUploadConfig): RxFileUpload =>
+  new RxFileUploadCls(config);
