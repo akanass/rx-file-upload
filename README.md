@@ -220,7 +220,7 @@ Function to upload **one** or **multiple** files, with or without chunks, to the
 > NOTE: This function will do a `POST` request to the server by default. Only `POST` and `PUT` requests are allowed. See [RxFileUploadConfig](#rxfileuploadconfig-1) to change the `method`.
 
 **Parameters:**
-> ***{File | File[]} oneFileOrMultipleFiles**: the file(s) to upload to the server.*
+> ***{File | File[]} oneFileOrMultipleFiles** (required): the file(s) to upload to the server.*
 > ***{[RxFileUploadAdditionalFormData](#rxfileuploadadditionalformdata)} additionalFormData** (optional): object representing additional data added in the `FormData` before sending to the server.*
 
 **Return:**
@@ -319,6 +319,7 @@ if (!!supportsRxFileUpload()) {
 Represents the instance of the object to upload file to the server. This is the **main** type of the library.
 
 > - ***{Observable\<[RxFileUploadProgressData](#rxfileuploadprogressdata)\>} .progress$**: the `Observable` which streams progress data `RxFileUploadProgressData` for each file(s)/chunk(s) uploaded.*
+> 
 > - ***{Observable<[RxFileUploadResponse\<T\>](#rxfileuploadresponset)>} .upload\<T\>(oneFileOrMultipleFiles: File | File[], additionalFormData?: [RxFileUploadAdditionalFormData](#rxfileuploadadditionalformdata))**: the function to upload file to the server and returns the `Observable` which streams the response `RxFileUploadResponse<T>`, from the server, after each file has been uploaded.*
 
 ### *RxFileUploadConfig:*
