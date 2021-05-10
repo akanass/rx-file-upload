@@ -57,6 +57,8 @@ This package can also be installed via **unpkg** by including the following scri
 <script src="https://unpkg.com/@akanass/rx-file-upload"></script>
 ```
 
+[back to top](#table-of-contents).
+
 ## Usage
 
 You must first have an HTML file containing an [input of type file](https://developer.mozilla.org/fr/docs/Web/HTML/Element/Input/file).
@@ -155,6 +157,8 @@ import { rxFileUpload } from '@akanass/rx-file-upload';
 
 To have a real implementation and test of this library, go to this [project](https://github.com/akanass/upload-file-with-chunks).
 
+[back to top](#table-of-contents).
+
 ## API in Details
 
 ### `rxFileUpload(config)`
@@ -176,6 +180,8 @@ const manager: RxFileUpload = rxFileUpload({
   url: 'http://my_api.com/upload'
 });
 ```
+
+[back to top](#table-of-contents).
 
 ### `.progress$`
 
@@ -204,6 +210,8 @@ manager.progress$.subscribe({
   complete: () => console.log('PROGRESS ALL FILES COMPLETED'),
 });
 ```
+
+[back to top](#table-of-contents).
 
 ### `.upload<T>(oneFileOrMultipleFiles[,additionalFormData])`
 
@@ -279,6 +287,8 @@ formData.append('chunkData', JSON.stringify(data.chunkData)); // optional
 formData.append('[additionalFormData.fieldName]', JSON.stringify(data['[additionalFormData.fieldName]'])); // optional
 ```
 
+[back to top](#table-of-contents).
+
 ### `supportsRxFileUpload()`
 
 Method that will allow you to **easily verify** if you are in a **compatible environment** before performing your treatments.
@@ -299,6 +309,8 @@ if (!!supportsRxFileUpload()) {
   // then do your stuff
 }
 ```
+
+[back to top](#table-of-contents).
 
 ## Types in Details
 
@@ -359,6 +371,8 @@ Represents the error response, from the server, streamed by the `Observable`, du
 > - ***{number} status** (required): The HTTP status code, if the request has completed. If not, it is set to `0`.*
 > - ***{any} response** (required): The error response data.*
 
+[back to top](#table-of-contents).
+
 ## Building for Production
 
 Two unbundled versions of this library are offered for your convenience, one targeting `ES5` and a second targeting `ESNEXT`.
@@ -410,6 +424,10 @@ export default {
 
 `'main:esnext'` must come first in the list to ensure that the `ESNEXT` version of this library is bundled. Additional values can be added afterwards as needed.
 
+[back to top](#table-of-contents).
+
 ## License
 
 This library is [MIT licensed](LICENSE.md).
+
+[back to top](#table-of-contents).
