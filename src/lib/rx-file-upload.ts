@@ -149,6 +149,7 @@ export class RxFileUploadCls implements RxFileUpload {
     // check the method in the config and set the default value to POST
     if (!['POST', 'PUT'].includes(config.method?.toUpperCase()))
       config.method = 'POST';
+    else config.method = config.method.toUpperCase();
 
     // set default chunk size to 1 Mb
     this._chunkSize = this._oneKb * this._oneKb;
