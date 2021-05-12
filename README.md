@@ -221,7 +221,7 @@ Function to upload **one** or **multiple** files, with or without chunks, to the
 > 
 > This function will do a `POST` request to the server by default. Only `POST` and `PUT` requests are allowed. See [RxFileUploadConfig](#rxfileuploadconfig-1) to change the `method`.
 > 
-> For each uploaded file, a **unique** identifier will be inserted in the `X-RxFileUpload-ID` **header** and in the `fileData` attribute of the [FormData](#data-sent-in-the-formdata) in order to be able to trace the transaction.
+> For each uploaded file, a **unique** identifier will be inserted in the `X-RxFileUpload-ID` **header** and in the `rxFileUploadId` attribute of the [FormData](#data-sent-in-the-formdata) in order to be able to trace the transaction.
 > This **unique** value will be present in **all new requests** and will be, of course, the **same** when sending the file in several **chunks**.
 > You can therefore associate them easily with their main file without having to look at the additional data inserted in the [FormData](#data-sent-in-the-formdata).
 
@@ -268,12 +268,12 @@ The data sent to the server will be included in a `FormData` object of which her
 ```ts
 // data object built and inserted in a FormData object
 const data: any = {
+  rxFileUploadId: [string], // unique identifier used to identify a transaction. This value is the same as in the `X-RxFileUpload-ID` header.
   fileData: {
     name: [File.name], // name property of the current file to upload
     size: [File.size], // size property of the current file to upload
     lastModified: [File.lastModified], // lastModified property of the current file to upload
     type: [File.type], // type property of the current file to upload
-    rxFileUploadId: [string], // unique identifier used to identify a file in a transaction. This value is the same as in the `X-RxFileUpload-ID` header.
     sha256Checksum?: [checksum] // generated only if config.addChecksum === true
   },
   file: [File], // the file object to upload which is the binary data. For a file upload, it's the file itself and for chunks upload, it's the chunk part split as the sequence described below.
@@ -289,6 +289,7 @@ const data: any = {
 // FormData instance
 const formData = new FormData();
 
+formData.append('rxFileUploadId', data.rxFileUploadId);
 formData.append('fileData', JSON.stringify(data.fileData));
 formData.append('file', data.file);
 formData.append('chunkData', JSON.stringify(data.chunkData)); // optional
