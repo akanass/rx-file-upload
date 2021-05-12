@@ -364,6 +364,8 @@ Represents the object to configure a new instance of [`RxFileUpload`](#rxfileupl
 > - ***{number} chunkSize** (optional): The size in `bytes` of a chunk. The size of a chunk must be a multiple of `1024` bytes (1 Kb) else an error will be thrown when the library is instantiated. (default: `1048576` (1 Mb)).*
 > 
 > - ***{boolean} addChecksum** (optional): The flag to indicate if the file(s) `sha256 checksum` should be calculated before sending to the server. However, you should know that the larger the file, the longer the generation time will be, which will cause a delay before sending it to the server. (default: `false`).*
+>
+> - ***{boolean} disableProgressCompletion** (optional): The flag to indicate if the [`.progress$`](#progress) Observable completion will be disabled at the end of the upload process. If you want to keep the same instance of [`RxFileUpload`](#rxfileupload) and use the [`.upload<T>(oneFileOrMultipleFiles[,additionalFormData])`](#uploadtonefileormultiplefilesadditionalformdata) method several times without having to subscribe again to the [`.progress$`](#progress) Observable, you must therefore deactivate its completion. (default: `false`).*
 
 ### *RxFileUploadAdditionalFormData:*
 
