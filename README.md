@@ -217,7 +217,13 @@ manager.progress$.subscribe({
 
 Function to upload **one** or **multiple** files, with or without chunks, to the server with **optional** additional data and returns the `Observable` which streams the response from the server after each file has been uploaded.
 
-> NOTE: This function will do a `POST` request to the server by default. Only `POST` and `PUT` requests are allowed. See [RxFileUploadConfig](#rxfileuploadconfig-1) to change the `method`.
+> NOTES:
+> 
+> This function will do a `POST` request to the server by default. Only `POST` and `PUT` requests are allowed. See [RxFileUploadConfig](#rxfileuploadconfig-1) to change the `method`.
+> 
+> For each uploaded file, a **unique** identifier will be inserted in the `X-RxFileUpload-ID` **header** and in the `fileData` attribute of the [FormData](#data-sent-in-the-formdata) in order to be able to trace the transaction.
+> This **unique** value will be present in **all new requests** and will be, of course, the **same** when sending the file in several **chunks**.
+> You can therefore associate them easily with their main file without having to look at the additional data inserted in the [FormData](#data-sent-in-the-formdata).
 
 **Parameters:**
 > ***{File | File[]} oneFileOrMultipleFiles** (required): the file(s) to upload to the server.*
@@ -267,9 +273,10 @@ const data: any = {
     size: [File.size], // size property of the current file to upload
     lastModified: [File.lastModified], // lastModified property of the current file to upload
     type: [File.type], // type property of the current file to upload
+    rxFileUploadId: [string], // unique identifier used to identify a file in a transaction. This value is the same as in the `X-RxFileUpload-ID` header.
     sha256Checksum?: [checksum] // generated only if config.addChecksum === true
   },
-  file: [File], // the file object to upload which is the binary data
+  file: [File], // the file object to upload which is the binary data. For a file upload, it's the file itself and for chunks upload, it's the chunk part split as the sequence described below.
   chunkData?: { // generated only if config.useChunks === true
     sequence: [number], // the current chunk number
     totalChunks: [number], // the total number of chunks
