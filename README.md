@@ -276,14 +276,14 @@ const data: any = {
     type: [File.type], // type property of the current file to upload
     sha256Checksum?: [checksum] // generated only if config.addChecksum === true
   },
-  file: [File], // the file object to upload which is the binary data. For a file upload, it's the file itself and for chunks upload, it's the chunk part split as the sequence described below.
+  [additionalFormData.fieldName]?: [additionalFormData.data], // generated only if `additionalFormData` object is passed in parameter of the upload method
   chunkData?: { // generated only if config.useChunks === true
     sequence: [number], // the current chunk number
     totalChunks: [number], // the total number of chunks
     startByte: [number], // the start byte number of the chunk
     endByte: [number] // the end byte number of the chunk
   },
-  [additionalFormData.fieldName]?: [additionalFormData.data] // generated only if `additionalFormData` object is passed in parameter of the upload method
+  file: [File], // the file object to upload which is the binary data. For a file upload, it's the file itself and for chunks upload, it's the chunk part split as the sequence described in chunkData
 };
 
 // FormData instance
@@ -291,9 +291,9 @@ const formData = new FormData();
 
 formData.append('rxFileUploadId', data.rxFileUploadId);
 formData.append('fileData', JSON.stringify(data.fileData));
-formData.append('file', data.file);
-formData.append('chunkData', JSON.stringify(data.chunkData)); // optional
 formData.append('[additionalFormData.fieldName]', JSON.stringify(data['[additionalFormData.fieldName]'])); // optional
+formData.append('chunkData', JSON.stringify(data.chunkData)); // optional
+formData.append('file', data.file);
 ```
 
 [back to top](#table-of-contents)
