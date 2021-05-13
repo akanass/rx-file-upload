@@ -23,6 +23,7 @@ import {
   RxFileUploadChunkSize,
   RxFileUploadConfig,
   RxFileUploadError,
+  RxFileUploadFileData,
   RxFileUploadProgressData,
   RxFileUploadResponse,
 } from './types';
@@ -110,28 +111,35 @@ export class RxFileUploadCls implements RxFileUpload {
    * @private
    * @internal
    */
-  private readonly _chunkSize: number;
+  private readonly _chunkSize: number = this._oneKb * this._oneKb;
   /**
    * Property to store flag to know if checksum is disable or not
    *
    * @private
    * @internal
    */
-  private readonly _addChecksum: boolean;
+  private readonly _addChecksum: boolean = false;
   /**
    * Property to store flag to know if chunks split is disable or not
    *
    * @private
    * @internal
    */
-  private readonly _useChunks: boolean;
+  private readonly _useChunks: boolean = false;
+  /**
+   * Property to store flag to know if progress Observable will complete at the end of the upload process
+   *
+   * @private
+   * @internal
+   */
+  private readonly _disableProgressCompletion: boolean = false;
   /**
    * Property to store the number of file to upload and know when complete the progress stream
    *
    * @private
    * @internal
    */
-  private _numberOfFilesToUpload: number;
+  private _numberOfFilesToUpload = 0;
   /**
    * Property to store progress Subject instance
    *
@@ -139,6 +147,22 @@ export class RxFileUploadCls implements RxFileUpload {
    * @internal
    */
   private readonly _progress$: Subject<RxFileUploadProgressData>;
+
+  /**
+   * List of RxFileUpload IDs
+   *
+   * @private
+   * @internal
+   */
+  private _rxFileUploadIds: string[] = [];
+
+  /**
+   * Name of the header to send the RxFileUpload ID
+   *
+   * @private
+   * @internal
+   */
+  private readonly _rxFileUploadIdHeaderName: string = 'X-RxFileUpload-ID';
 
   /**
    * Class constructor
@@ -165,9 +189,6 @@ export class RxFileUploadCls implements RxFileUpload {
       config.method = this._defaultAjaxMethod;
     else config.method = config.method.toUpperCase();
 
-    // set default chunk size to 1 Mb
-    this._chunkSize = this._oneKb * this._oneKb;
-
     // check if chunk size property is in the config
     if (typeof config.chunkSize === 'number') {
       // check chunk size before storing it
@@ -181,25 +202,28 @@ export class RxFileUploadCls implements RxFileUpload {
       delete config.chunkSize;
     }
 
-    // set default flag value to false
-    this._addChecksum = false;
-
     // check if flag is set in the config
     if (typeof config.addChecksum === 'boolean') {
+      // set flag to know if checksum is disable or not
       this._addChecksum = config.addChecksum;
       // delete flag in config
       delete config.addChecksum;
     }
 
-    // set default flag value to false
-    this._useChunks = false;
-
     // check if flag is set in the config
     if (typeof config.useChunks === 'boolean') {
-      // set flag to know if checksum is disable or not
+      // set flag to know if chunks are disable or not
       this._useChunks = config.useChunks;
       // delete flag in config
       delete config.useChunks;
+    }
+
+    // check if flag is set in the config
+    if (typeof config.disableProgressCompletion === 'boolean') {
+      // set flag to know if progress Observable will complete at the end of the upload process
+      this._disableProgressCompletion = config.disableProgressCompletion;
+      // delete flag in config
+      delete config.disableProgressCompletion;
     }
 
     // set ajax configuration property
@@ -207,9 +231,6 @@ export class RxFileUploadCls implements RxFileUpload {
 
     // set ajax function property
     this._ajax = ajax;
-
-    // init the number of files to 0
-    this._numberOfFilesToUpload = 0;
 
     // set progress Subject
     this._progress$ = new Subject<RxFileUploadProgressData>();
@@ -236,40 +257,74 @@ export class RxFileUploadCls implements RxFileUpload {
     oneFileOrMultipleFiles: File | File[],
     additionalFormData?: RxFileUploadAdditionalFormData,
   ): Observable<RxFileUploadResponse<T>> =>
-    from([].concat(oneFileOrMultipleFiles)).pipe(
-      // check if we really have file object inside our array
-      filter((file: File) => file instanceof File),
-      toArray(),
-      // check if we have at least one file to upload
-      mergeMap(
-        (files: File[]): Observable<File[]> =>
-          of(files.length).pipe(
-            filter((length: number): boolean => length === 0),
-            mergeMap(
-              (): Observable<never> =>
-                throwError(
-                  () =>
-                    new Error('You must provide at least one file to upload.'),
+    // check if a process is already running for this instance of RxFileUpload
+    this._checkInstanceProcess().pipe(
+      mergeMap(() =>
+        // start upload process
+        from([].concat(oneFileOrMultipleFiles)).pipe(
+          // check if we really have file object inside our array
+          filter((file: File) => file instanceof File),
+          toArray(),
+          // check if we have at least one file to upload
+          mergeMap(
+            (files: File[]): Observable<File[]> =>
+              of(files.length).pipe(
+                filter((length: number): boolean => length === 0),
+                mergeMap(
+                  (): Observable<never> =>
+                    throwError(
+                      () =>
+                        new Error(
+                          'You must provide at least one file to upload.',
+                        ),
+                    ),
                 ),
-            ),
-            defaultIfEmpty(files),
-          ),
-      ),
-      // store real number of files to upload for progress process
-      tap((files: File[]) => (this._numberOfFilesToUpload = files.length)),
-      // upload file(s)
-      mergeMap(
-        (files: File[]): Observable<RxFileUploadResponse<T>> =>
-          from(files).pipe(
-            mergeMap((file: File, fileIndex: number) =>
-              this._uploadFile<T>(
-                file,
-                additionalFormData,
-                files.length > 1 ? fileIndex : undefined,
+                defaultIfEmpty(files),
               ),
-            ),
+          ),
+          // reset RxFileUpload IDs array
+          tap(() => (this._rxFileUploadIds = [])),
+          // store real number of files to upload for progress process
+          tap((files: File[]) => (this._numberOfFilesToUpload = files.length)),
+          // upload file(s)
+          mergeMap(
+            (files: File[]): Observable<RxFileUploadResponse<T>> =>
+              from(files).pipe(
+                mergeMap(
+                  (
+                    file: File,
+                    fileIndex: number,
+                  ): Observable<RxFileUploadResponse<T>> =>
+                    this._uploadFile<T>(
+                      file,
+                      additionalFormData,
+                      files.length > 1 ? fileIndex : undefined,
+                    ),
+                ),
+              ),
+          ),
+        ),
+      ),
+    );
+
+  /**
+   * Function to check if we already have a process running for the current instance before calling again the upload method
+   */
+  private _checkInstanceProcess = (): Observable<void> =>
+    of(this._numberOfFilesToUpload).pipe(
+      filter(
+        (numberOfFilesToUpload: number): boolean => numberOfFilesToUpload !== 0,
+      ),
+      mergeMap(
+        (): Observable<never> =>
+          throwError(
+            () =>
+              new Error(
+                'Files are already being uploaded for this instance of "RxFileUpload". You must either create a new instance before calling "upload" method or send them all together.',
+              ),
           ),
       ),
+      defaultIfEmpty(undefined),
     );
 
   /**
@@ -289,11 +344,13 @@ export class RxFileUploadCls implements RxFileUpload {
     additionalFormData?: RxFileUploadAdditionalFormData,
     fileIndex?: number,
   ): Observable<RxFileUploadResponse<T>> =>
-    of(of(this._useChunks)).pipe(
+    // generate transaction id for current file
+    this._generateRxFileUploadId(fileIndex).pipe(
       mergeMap(
-        (obs: Observable<boolean>): Observable<RxFileUploadResponse<T>> =>
+        (): Observable<RxFileUploadResponse<T>> =>
+          // check if we are using chunks
           merge(
-            obs.pipe(
+            of(this._useChunks).pipe(
               filter((useChunks: boolean): boolean => !!useChunks),
               mergeMap(
                 (): Observable<RxFileUploadResponse<T>> =>
@@ -304,7 +361,7 @@ export class RxFileUploadCls implements RxFileUpload {
                   ),
               ),
             ),
-            obs.pipe(
+            of(this._useChunks).pipe(
               filter((useChunks: boolean): boolean => !useChunks),
               mergeMap(
                 (): Observable<RxFileUploadResponse<T>> =>
@@ -332,7 +389,7 @@ export class RxFileUploadCls implements RxFileUpload {
     additionalFormData?: RxFileUploadAdditionalFormData,
     fileIndex?: number,
   ): Observable<RxFileUploadResponse<T>> =>
-    this._fileBodyData(file, additionalFormData).pipe(
+    this._fileBodyData(file, additionalFormData, fileIndex).pipe(
       mergeMap(
         (f: FormData): Observable<RxFileUploadResponse<T>> =>
           this._makeAjaxCall<T>(f, undefined, fileIndex),
@@ -356,7 +413,7 @@ export class RxFileUploadCls implements RxFileUpload {
     additionalFormData?: RxFileUploadAdditionalFormData,
     fileIndex?: number,
   ): Observable<RxFileUploadResponse<T>> =>
-    this._chunkBodyData(file, additionalFormData).pipe(
+    this._chunkBodyData(file, additionalFormData, fileIndex).pipe(
       concatMap(
         (f: RxFileUploadChunkFormData): Observable<RxFileUploadResponse<T>> =>
           this._makeAjaxCall<T>(f.formData, f.chunkSequenceData, fileIndex),
@@ -379,7 +436,7 @@ export class RxFileUploadCls implements RxFileUpload {
     chunk?: RxFileUploadChunkSequenceData,
     fileIndex?: number,
   ): Observable<RxFileUploadResponse<T>> =>
-    this._ajax<T>({ ...this._config, body: f }).pipe(
+    this._ajax<T>(this._buildConfig(f, fileIndex)).pipe(
       catchError(
         (e: AjaxError): Observable<never> =>
           throwError(
@@ -435,7 +492,8 @@ export class RxFileUploadCls implements RxFileUpload {
               ),
               tap(() => this._numberOfFilesToUpload--),
               tap(() =>
-                this._numberOfFilesToUpload === 0
+                this._numberOfFilesToUpload === 0 &&
+                !this._disableProgressCompletion
                   ? this._progress$.complete()
                   : undefined,
               ),
@@ -509,6 +567,7 @@ export class RxFileUploadCls implements RxFileUpload {
    *
    * @param {File} file the file to upload to the server
    * @param {RxFileUploadAdditionalFormData} additionalFormData sent to the server
+   * @param {number} fileIndex the index of the file for a multiple upload
    *
    * @return {Observable<FormData>} the Observable which streams the FormData object to upload full file
    *
@@ -518,22 +577,21 @@ export class RxFileUploadCls implements RxFileUpload {
   private _fileBodyData = (
     file: File,
     additionalFormData?: RxFileUploadAdditionalFormData,
+    fileIndex?: number,
   ): Observable<FormData> =>
-    this._fileDataWithAdditionalData(file, additionalFormData).pipe(
+    this._fileDataWithAdditionalData(file, additionalFormData, fileIndex).pipe(
       map(
         (data: any): RxFileUploadBodyData => ({
           formData: new FormData(),
           data: { ...data, file },
         }),
       ),
-      map(
-        (_: RxFileUploadBodyData): FormData => {
-          Object.keys(_.data).forEach((key: string) =>
-            _.formData.append(key, _.data[key]),
-          );
-          return _.formData;
-        },
-      ),
+      map((_: RxFileUploadBodyData): FormData => {
+        Object.keys(_.data).forEach((key: string) =>
+          _.formData.append(key, _.data[key]),
+        );
+        return _.formData;
+      }),
     );
 
   /**
@@ -541,6 +599,7 @@ export class RxFileUploadCls implements RxFileUpload {
    *
    * @param {File} file the file to upload to the server
    * @param {RxFileUploadAdditionalFormData} additionalFormData sent to the server
+   * @param {number} fileIndex the index of the file for a multiple upload
    *
    * @return {Observable<any>} the Observable which streams the data of the File to upload with optional additional data to insert inside the FormData
    *
@@ -550,37 +609,41 @@ export class RxFileUploadCls implements RxFileUpload {
   private _fileDataWithAdditionalData = (
     file: File,
     additionalFormData?: RxFileUploadAdditionalFormData,
+    fileIndex?: number,
   ): Observable<any> =>
-    of(of(this._addChecksum)).pipe(
+    of({
+      name: file.name,
+      size: file.size,
+      lastModified: file.lastModified,
+      type: file.type,
+    } as RxFileUploadFileData).pipe(
       mergeMap(
-        (obs: Observable<boolean>): Observable<{ fileData: string }> =>
-          obs.pipe(
+        (fileData: RxFileUploadFileData): Observable<RxFileUploadFileData> =>
+          of(this._addChecksum).pipe(
             filter((addChecksum: boolean): boolean => !!addChecksum),
             mergeMap(
-              (): Observable<{ fileData: string }> =>
+              (): Observable<RxFileUploadFileData> =>
                 this._calculateCheckSum(file).pipe(
-                  map((checksum: string): { fileData: string } => ({
-                    fileData: this._serialize({
-                      name: file.name,
-                      size: file.size,
-                      lastModified: file.lastModified,
-                      type: file.type,
+                  map(
+                    (checksum: string): RxFileUploadFileData => ({
+                      ...fileData,
                       sha256Checksum: checksum,
                     }),
-                  })),
+                  ),
                 ),
             ),
-            defaultIfEmpty({
-              fileData: this._serialize({
-                name: file.name,
-                size: file.size,
-                lastModified: file.lastModified,
-                type: file.type,
-              }),
-            }),
+            defaultIfEmpty(fileData),
           ),
       ),
-      map((data: { fileData: string }): any =>
+      map((fileData: RxFileUploadFileData): {
+        rxFileUploadId: string;
+        fileData: string;
+      } => ({
+        rxFileUploadId:
+          this._rxFileUploadIds[typeof fileIndex === 'number' ? fileIndex : 0],
+        fileData: this._serialize(fileData),
+      })),
+      map((data: { rxFileUploadId: string; fileData: string }): any =>
         typeof additionalFormData !== 'undefined' &&
         typeof additionalFormData.fieldName === 'string' &&
         ['string', 'object'].includes(typeof additionalFormData.data)
@@ -599,6 +662,7 @@ export class RxFileUploadCls implements RxFileUpload {
    *
    * @param {File} file the file to upload to the server
    * @param {RxFileUploadAdditionalFormData} additionalFormData sent to the server
+   * @param {number} fileIndex the index of the file for a multiple upload
    *
    * @return {Observable<RxFileUploadChunkFormData>} the Observable which streams the FormData object to upload file with chunks
    *
@@ -608,8 +672,9 @@ export class RxFileUploadCls implements RxFileUpload {
   private _chunkBodyData = (
     file: File,
     additionalFormData?: RxFileUploadAdditionalFormData,
+    fileIndex?: number,
   ): Observable<RxFileUploadChunkFormData> =>
-    this._fileDataWithAdditionalData(file, additionalFormData).pipe(
+    this._fileDataWithAdditionalData(file, additionalFormData, fileIndex).pipe(
       mergeMap(
         (fileData: any): Observable<RxFileUploadChunkFormData> =>
           this._calculateChunkSizes(file.size).pipe(
@@ -624,11 +689,6 @@ export class RxFileUploadCls implements RxFileUpload {
                       index: number,
                     ): RxFileUploadChunkBodyData => ({
                       data: {
-                        file: new File(
-                          [file.slice(_.startByte, _.endByte)],
-                          file.name,
-                          { type: file.type },
-                        ),
                         ...fileData,
                         chunkData: this._serialize({
                           sequence: index + 1,
@@ -636,6 +696,11 @@ export class RxFileUploadCls implements RxFileUpload {
                           startByte: _.startByte,
                           endByte: _.endByte,
                         }),
+                        file: new File(
+                          [file.slice(_.startByte, _.endByte)],
+                          file.name,
+                          { type: file.type },
+                        ),
                       },
                       formData: new FormData(),
                       chunkSequenceData: {
@@ -666,13 +731,16 @@ export class RxFileUploadCls implements RxFileUpload {
   /**
    * Helper to check the validity of the config object before setting it in instance property
    *
-   * @param {Omit<RxFileUploadConfig, 'chunkSize' | 'addChecksum' | 'useChunks'>} config object to configure the xhr request
+   * @param {Omit<RxFileUploadConfig, 'chunkSize' | 'addChecksum' | 'useChunks' | 'disableProgressCompletion'>} config object to configure the xhr request
    *
    * @private
    * @internal
    */
   private _setAjaxConfig = (
-    config: Omit<RxFileUploadConfig, 'chunkSize' | 'addChecksum' | 'useChunks'>,
+    config: Omit<
+      RxFileUploadConfig,
+      'chunkSize' | 'addChecksum' | 'useChunks' | 'disableProgressCompletion'
+    >,
   ): void => {
     // check if config's properties are allowed -> JS verification when not using typings
     Object.keys(config).forEach((_: string) => {
@@ -702,6 +770,27 @@ export class RxFileUploadCls implements RxFileUpload {
       includeUploadProgress: true,
     };
   };
+
+  /**
+   * Helper to build config to create AJAX request
+   *
+   * @param {FormData} f the form data object to send to the server
+   * @param {number} fileIndex the index of the file for a multiple upload
+   *
+   * @return {AjaxConfig} the configuration to make the AJAX request
+   *
+   * @private
+   * @internal
+   */
+  private _buildConfig = (f: FormData, fileIndex?: number): AjaxConfig => ({
+    ...this._config,
+    headers: {
+      ...this._config.headers,
+      [this._rxFileUploadIdHeaderName]:
+        this._rxFileUploadIds[typeof fileIndex === 'number' ? fileIndex : 0],
+    },
+    body: f,
+  });
 
   /**
    * Helper to calculate each chunk size
@@ -744,6 +833,28 @@ export class RxFileUploadCls implements RxFileUpload {
       map((arrayBuffer: ArrayBuffer): string =>
         SHA256(WordArray.create(new Uint8Array(arrayBuffer))).toString(),
       ),
+    );
+
+  /**
+   * Helper to generate a unique RxFileUpload ID to pass it in a header and in file data
+   *
+   * @param {number} fileIndex the index of the file for a multiple upload
+   *
+   * @private
+   * @internal
+   */
+  private _generateRxFileUploadId = (fileIndex?: number): Observable<void> =>
+    of(new Date().getTime() * Math.floor(Math.random() * 10 + 1)).pipe(
+      map((transactionId: number): string =>
+        SHA256(`${transactionId}`).toString(),
+      ),
+      tap(
+        (rxFileUploadId: string) =>
+          (this._rxFileUploadIds[
+            typeof fileIndex === 'number' ? fileIndex : 0
+          ] = rxFileUploadId),
+      ),
+      map(() => undefined),
     );
 
   /**

@@ -39,7 +39,12 @@ export type RxFileUploadConfig = Omit<
   | 'progressSubscriber'
   | 'includeUploadProgress'
   | 'includeDownloadProgress'
-> & { chunkSize?: number; addChecksum?: boolean; useChunks?: boolean };
+> & {
+  chunkSize?: number;
+  addChecksum?: boolean;
+  useChunks?: boolean;
+  disableProgressCompletion?: boolean;
+};
 
 /**
  * Additional FormData type definition
@@ -130,3 +135,16 @@ export type RxFileUploadChunkBodyData = RxFileUploadBodyData & {
  * @internal
  */
 export type RxFileUploadChunkFormData = Omit<RxFileUploadChunkBodyData, 'data'>;
+
+/**
+ * FileData type definition
+ *
+ * @internal
+ */
+export type RxFileUploadFileData = {
+  name: string;
+  size: number;
+  lastModified: number;
+  type: string;
+  sha256Checksum?: string;
+};
