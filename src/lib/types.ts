@@ -148,3 +148,18 @@ export type RxFileUploadFileData = {
   type: string;
   sha256Checksum?: string;
 };
+
+/**
+ * ChunkData type definition
+ *
+ * @internal
+ */
+export type RxFileUploadChunkData = Omit<
+  RxFileUploadFileData,
+  'sha256Checksum'
+> & {
+  sequence: number;
+  totalChunks: number;
+  startByte: number;
+  endByte: number;
+};

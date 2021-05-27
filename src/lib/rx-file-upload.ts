@@ -18,6 +18,7 @@ import {
   RxFileUploadAdditionalFormData,
   RxFileUploadBodyData,
   RxFileUploadChunkBodyData,
+  RxFileUploadChunkData,
   RxFileUploadChunkFormData,
   RxFileUploadChunkSequenceData,
   RxFileUploadChunkSize,
@@ -126,6 +127,13 @@ export class RxFileUploadCls implements RxFileUpload {
    * @internal
    */
   private readonly _useChunks: boolean = false;
+  /**
+   * Property to store default mime type for a chunk
+   *
+   * @private
+   * @internal
+   */
+  private readonly _chunkMimeType: string = 'application/octet-stream';
   /**
    * Property to store flag to know if progress Observable will complete at the end of the upload process
    *
@@ -691,15 +699,22 @@ export class RxFileUploadCls implements RxFileUpload {
                       data: {
                         ...fileData,
                         chunkData: this._serialize({
+                          name: `${file.name}.part${index + 1}`,
+                          size: _.endByte - _.startByte,
+                          lastModified: file.lastModified,
+                          type: this._chunkMimeType,
                           sequence: index + 1,
                           totalChunks: chunkSizes.length,
                           startByte: _.startByte,
                           endByte: _.endByte,
-                        }),
+                        } as RxFileUploadChunkData),
                         file: new File(
                           [file.slice(_.startByte, _.endByte)],
-                          file.name,
-                          { type: file.type },
+                          `${file.name}.part${index + 1}`,
+                          {
+                            type: this._chunkMimeType,
+                            lastModified: file.lastModified,
+                          },
                         ),
                       },
                       formData: new FormData(),
