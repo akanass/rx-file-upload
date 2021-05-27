@@ -278,12 +278,16 @@ const data: any = {
   },
   [additionalFormData.fieldName]?: [additionalFormData.data], // generated only if `additionalFormData` object is passed in parameter of the upload method
   chunkData?: { // generated only if config.useChunks === true
+    name: [`${File.name}.part${chunkData.sequence}`], // name property of the current chunk to upload which is the current `File.name` suffixed by `.partX` with `X` the value of the current sequence 
+    size: [chunkData.endByte - chunkData.startByte], // size property of the current chunk to upload which is a helper to avoid the calculation of `endByte - startByte`
+    lastModified: [File.lastModified], // lastModified property of the current chunk to upload which is the same than the file itself
+    type: 'application/octet-stream', // type property of the current chunk to upload which is only a binary part of the full file
     sequence: [number], // the current chunk number
     totalChunks: [number], // the total number of chunks
     startByte: [number], // the start byte number of the chunk
     endByte: [number] // the end byte number of the chunk
   },
-  file: [File], // the file object to upload which is the binary data. For a file upload, it's the file itself and for chunks upload, it's the chunk part split as the sequence described in chunkData
+  file: [File], // the file object to upload which is the binary data. For a file upload, it's the file itself and for chunks upload, it's a new instance of the File object for each individual chunk: `new File([File.slice(chunkData.startByte, chunkData.endByte)], chunkData.name, {type: chunkData.type, lastModified: chunkData.lastModified})`
 };
 
 // FormData instance
