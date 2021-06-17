@@ -30,11 +30,6 @@ However, we provide a [method](#supportsrxfileupload) that will allow you to **e
   * [RxFileUploadProgressData](#rxfileuploadprogressdata)
   * [RxFileUploadResponse\<T\>](#rxfileuploadresponset)
   * [RxFileUploadError](#rxfileuploaderror)
-* [Building for Production](#building-for-production)
-    * [ES5](#es5)
-    * [ESNEXT](#esnext)
-        * [Webpack support](#webpack-support)
-        * [Rollup support](#rollup-support)
 * [License](#license)
 
 ## Installation
@@ -406,69 +401,6 @@ Represents the error response, from the server, streamed by the `Observable`, du
 > - ***{number} status** (required): The HTTP status code, if the request has completed. If not, it is set to `0`.*
 > 
 > - ***{any} response** (required): The error response data.*
-
-[back to top](#table-of-contents)
-
-## Building for Production
-
-Two unbundled versions of this library are offered for your convenience, one targeting `ES5` and a second targeting `ESNEXT`.
-
-### *ES5:*
-
-The `ES5` version is suitable for use when **deprecated browsers** like `IE10+` or `Edge Legacy` need to be supported. This version is also the **default** version that gets pulled in as the `"main"` entry in **package.json**.
-
-**TypeScript** and **JavaScript** codebases alike can import and use this library without any special build configuration considerations.
-
-However, you will need to ensure that the `tslib@^2.2.0` dependency gets pulled into your build artifact then you will need to install this package **manually** by adding it to `devDependencies` in your project's **package.json**:
-
-```sh
-$> npm install --save-dev tslib
-
-or 
-
-$> yarn add -D tslib
-```
-
-### *ESNEXT:*
-
-The `ESNEXT` version is suitable for use when only **modern browsers** need to be supported. **TypeScript** and **JavaScript** codebases alike can import and use this library. However, you will need to ensure that your bundler pulls in the `ESNEXT` version of the library when building your application!
-
-See bundler instructions below.
-
-#### Webpack support
-
-No matter the `"target"` of your build you'll need to indicate additional files for webpack to resolve via the [`"resolve.mainFields"`](https://webpack.js.org/configuration/resolve/#resolvemainfields) property in your config. Resolve the `"main:esnext"` field defined in **package.json**:
-
-```js
-module.exports = {
-  //...
-  resolve: {
-    mainFields: [ 'main:esnext', 'module', 'main' ],
-  },
-};
-```
-
-`'main:esnext'` must come first in the list to ensure that the `ESNEXT` version of this library is bundled. Additional values can be added afterwards as needed.
-
-#### Rollup support
-
-Add the [`@rollup/plugin-node-resolve`](https://github.com/rollup/rollup-plugin-node-resolve#usage) plugin to your Rollup config to read in the `"main:esnext"` field from **package.json**:
-
-```js
-// rollup.config.js
-import resolve from 'rollup-plugin-node-resolve';
-
-export default {
-  // input: ...
-  // output: ...
-  plugins: [
-    //...
-    resolve({ mainFields: [ 'main:esnext', 'module', 'main' ] }),
-  ]
-}
-```
-
-`'main:esnext'` must come first in the list to ensure that the `ESNEXT` version of this library is bundled. Additional values can be added afterwards as needed.
 
 [back to top](#table-of-contents)
 

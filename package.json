@@ -1,9 +1,8 @@
 {
   "name": "@akanass/rx-file-upload",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Library to upload a file in the browser and send it fully or in several chunks to the server.",
-  "main": "esm5/rx-file-upload.js",
-  "main:esnext": "esm/rx-file-upload.js",
+  "main": "bundle/rx-file-upload.js",
   "unpkg": "bundle/rx-file-upload.umd.min.js",
   "types": "types/index.d.ts",
   "repository": {
@@ -18,7 +17,7 @@
   "private": false,
   "scripts": {
     "test": "echo 'To have a real implementation and test of this library, go to https://github.com/akanass/upload-file-with-chunks'",
-    "build": "rollup -c"
+    "build": "rollup -c rollup.config.js"
   },
   "bugs": "https://github.com/akanass/rx-file-upload/issues",
   "homepage": "https://github.com/akanass/rx-file-upload#readme",
@@ -52,25 +51,23 @@
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.0.0",
     "@rollup/plugin-typescript": "^8.2.1",
-    "@types/node": "^15.6.1",
+    "@types/node": "^15.12.2",
     "@types/fs-extra": "^9.0.11",
-    "@typescript-eslint/eslint-plugin": "^4.25.0",
-    "@typescript-eslint/parser": "^4.25.0",
-    "eslint": "^7.27.0",
+    "@typescript-eslint/eslint-plugin": "^4.27.0",
+    "@typescript-eslint/parser": "^4.27.0",
+    "eslint": "^7.28.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
     "fs-extra": "^10.0.0",
-    "prettier": "^2.3.0",
-    "rollup": "^2.50.2",
+    "prettier": "^2.3.1",
+    "rollup": "^2.52.1",
     "rollup-plugin-delete": "^2.0.0",
     "rollup-plugin-terser": "^7.0.2",
     "rxjs": "^7.1.0",
     "ts-node": "^10.0.0",
-    "tslib": "^2.2.0",
-    "typescript": "^4.3.2"
+    "typescript": "^4.3.3"
   },
   "peerDependencies": {
-    "rxjs": "^7.1.0",
-    "tslib": "^2.2.0"
+    "rxjs": "^7.1.0"
   }
 }

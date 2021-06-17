@@ -14,7 +14,7 @@ const config: RollupOptions[] = [
     output: {
       dir: './dist',
       format: 'esm',
-      entryFileNames: 'esm/rx-file-upload.js',
+      entryFileNames: 'bundle/rx-file-upload.js',
       preferConst: true,
     },
     plugins: [
@@ -30,28 +30,6 @@ const config: RollupOptions[] = [
       addPackageFiles(['README.md', 'package.json']),
     ],
     external: [
-      'rxjs',
-      'rxjs/ajax',
-      'rxjs/operators',
-      'crypto-es/lib/sha256',
-      'crypto-es/lib/core',
-    ],
-  },
-  {
-    input: './src/index.ts',
-    output: {
-      dir: './dist',
-      format: 'esm',
-      entryFileNames: 'esm5/rx-file-upload.js',
-    },
-    plugins: [
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      typescript({ tsconfig: './tsconfig.es5.json' }),
-      nodeResolve(),
-    ],
-    external: [
-      'tslib',
       'rxjs',
       'rxjs/ajax',
       'rxjs/operators',
