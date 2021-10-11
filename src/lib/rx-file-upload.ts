@@ -643,14 +643,20 @@ export class RxFileUploadCls implements RxFileUpload {
             defaultIfEmpty(fileData),
           ),
       ),
-      map((fileData: RxFileUploadFileData): {
-        rxFileUploadId: string;
-        fileData: string;
-      } => ({
-        rxFileUploadId:
-          this._rxFileUploadIds[typeof fileIndex === 'number' ? fileIndex : 0],
-        fileData: this._serialize(fileData),
-      })),
+      map(
+        (
+          fileData: RxFileUploadFileData,
+        ): {
+          rxFileUploadId: string;
+          fileData: string;
+        } => ({
+          rxFileUploadId:
+            this._rxFileUploadIds[
+              typeof fileIndex === 'number' ? fileIndex : 0
+            ],
+          fileData: this._serialize(fileData),
+        }),
+      ),
       map((data: { rxFileUploadId: string; fileData: string }): any =>
         typeof additionalFormData !== 'undefined' &&
         typeof additionalFormData.fieldName === 'string' &&
